@@ -33,11 +33,11 @@ jobs:
       with:
         go-version-file: 'go.mod'
     - run: go test -v ./...
-    # The imagecache consumer half (overlay mounts, whiteout mknod, trusted.*
-    # xattrs) is guarded by root-only tests that skip for the unprivileged
-    # runner user above; run that one package again as root so they execute.
-    - name: imagecache privileged tests
-      run: sudo -E env "PATH=$PATH" go test -v -count=1 ./internal/imagecache/
+    # Root-gated tests (overlay mounts, whiteout mknod, trusted.* xattrs, ...)
+    # skip for the unprivileged runner user above; rerun the packages that
+    # contain them (any test importing internal/roottest) under sudo.
+    - name: root-gated tests
+      run: hack/run-root-tests.sh -v
     - name: verify
       run: hack/verify-all.sh
   # One kind cluster exercises BOTH runtimes. Free x86-64 ubuntu-latest runners
