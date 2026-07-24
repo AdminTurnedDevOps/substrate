@@ -178,6 +178,7 @@ func (w *ActorWorkflow) ResumeActor(ctx context.Context, atespace, name string, 
 	steps := []WorkflowStep[*ResumeInput, *ResumeState]{
 		&LoadActorForResumeStep{store: w.store, actorTemplateLister: w.actorTemplateLister},
 		&AssignWorkerStep{store: w.store, workerCache: w.workerCache},
+		&AttachVolumesStep{store: w.store},
 		&CallAteletRestoreStep{store: w.store, dialer: w.dialer, kubeClient: w.kubeClient, secretCache: w.secretCache, workerPoolLister: w.workerPoolLister, sandboxConfigLister: w.sandboxConfigLister},
 		&FinalizeRunningStep{store: w.store},
 	}
@@ -207,6 +208,7 @@ func (w *ActorWorkflow) SuspendActor(ctx context.Context, atespace, name string)
 		&LoadActorForSuspendStep{store: w.store, actorTemplateLister: w.actorTemplateLister},
 		&MarkSuspendingStep{store: w.store},
 		&CallAteletSuspendStep{store: w.store, dialer: w.dialer},
+		&DetachVolumesStep{store: w.store},
 		&FinalizeSuspendedStep{store: w.store},
 	}
 
@@ -235,6 +237,7 @@ func (w *ActorWorkflow) PauseActor(ctx context.Context, atespace, name string) (
 		&LoadActorForPauseStep{store: w.store, actorTemplateLister: w.actorTemplateLister},
 		&MarkPausingStep{store: w.store},
 		&CallAteletPauseStep{store: w.store, dialer: w.dialer},
+		&DetachVolumesForPauseStep{store: w.store},
 		&FinalizePausedStep{store: w.store},
 	}
 
