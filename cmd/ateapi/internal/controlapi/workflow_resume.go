@@ -101,7 +101,7 @@ func (s *LoadActorForResumeStep) Execute(ctx context.Context, input *ResumeInput
 		wk, err := s.store.GetWorker(ctx, actor.AteomPodNamespace, actor.WorkerPoolName, actor.AteomPodName)
 		if err != nil {
 			// Crash the actor if it was assigned to a deleted pod.
-			if errors.Is(err, ErrWorkerPodNotFound) {
+			if errors.Is(err, store.ErrNotFound) {
 				if cerr := crashActor(ctx, s.store, input.Atespace, input.ActorName); cerr != nil {
 					return cerr
 				}
